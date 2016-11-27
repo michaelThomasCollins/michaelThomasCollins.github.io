@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas id="gc" width="640" height="480"></canvas>
+
+<div id="video-div" style="display:none;"></div>
+<div id="gif-div" style="position:absolute;top:125px;left:250px;"></div>
+
+<script>
+    paddle1y = paddle2y = 40;
+    paddleWidth = 10;
+    paddleHeight = 100;
+
+    ballx = bally = 50;
+    ballDimension = 20;
+    xVelocity = yVelocity = 4;
+
+    score1 = score2 = 0;
+    aiSpeed = 4;
+
+    var url = ['Ap4nvdEotqw?', 'wsZ7013yHiw?start=3&', '6-Iz3e0kwv8?start=7&', 'qmQ4NNuxjnk?', 'y3RUimMOxFY?start=16&', 'AIa8IhgLDI0?', 'a3Xnolj1vdo?start=1&', '2T_obaO46Bo?start=75&', '_PlN4QNz7E4?', '2lPcCNyopGI?', '-LCFdeJ2xRw?'];
+
+    var gif = ['http://dumpfm.s3.amazonaws.com/images/20110517/1305608184000-dumpfm-frankhats-cut-kevinexplosionlarge-1.gif',
+        'http://rs651.pbsrc.com/albums/uu236/416o/explosion.gif~c200',
+        'https://1.bp.blogspot.com/-yRiJmyyt-1A/WBBCkH-08lI/AAAAAAAALJ8/q94PJ1S3jq4NwphJUSbDdJk9BlCsEtZ_gCLcB/s320/Gambar%2BAnimasi%2BBergerak%2BKartun%2BLucu%2BPisang%2BMenangis%2BAnimated%2BGif.gif',
+        'https://i.imgur.com/2tBq6uh.gif',
+        'https://s-media-cache-ak0.pinimg.com/originals/d0/72/a4/d072a4c1bad2f9ad2ed81783d05a1c77.gif',
+        'http://i903.photobucket.com/albums/ac239/Dediekusmayadi/bean11.gif',
+        'http://rs298.pbsrc.com/albums/mm253/clintcatalyst/Get%20GIFfy/TransparentBackground.gif~c200',
+        'https://media.giphy.com/media/BetLyuCzghyww/giphy.gif',
+        'http://www.alecjacobson.com/weblog/media/worm-propeller-animation.gif',
+        'http://rs644.pbsrc.com/albums/uu166/4X3L/Forum%20Sets/Ubrik.gif~c200',
+        'http://www.lovethisgif.com/uploaded_images/53862-Go-Back-Gallery-For-Loading-Animated-Gif-Transparent-Background-....gif',
+        'https://media.giphy.com/media/eEbiAqk9YUT5e/giphy.gif',
+        'http://ppt.wz51z.com/EC3/CD5/animations/aquatic_animals/fish/little_fish_swimming_hc.gif',
+        'http://i.mobavatar.com/i-m-green/dugong.gif',
+        'http://ppt.wz51z.com/EC3/CD3/animations/people_3/surfer/dude_surfing_hc.gif',
+        'http://userscontent2.emaze.com/images/382dbc68-c205-4ae9-9dd6-950df873939b/98953383-ea5d-48a1-92cf-8444540e9951.gif',
+        'http://ppt.wz51z.com/PMP2/Money.To.People/animations/nature/miscellaneous/flaming_meteor_hb.gif',
+        'http://dumpfm.s3.amazonaws.com/images/20110321/1300765570564-dumpfm-FAUXreal-on47et8f7yo.gif',
+        'http://ci.memecdn.com/945217.gif'
+    ];
+    function getIframe() {
+        var selectedUrl = url[Math.floor(Math.random() * url.length)];
+        return '<iframe width="420" height="315" src="https://www.youtube.com/embed/' + selectedUrl + 'autoplay=1"></iframe>'
+    }
+    function getGif() {
+        var selectedGif = gif[Math.floor(Math.random() * gif.length)];
+        return '<img src="' + selectedGif + '"/>';
+    }
+
+    window.onload = function () {
+        canvas = document.getElementById("gc");
+        cc = canvas.getContext('2d');
+        //Update canvas 30 times a second
+        setInterval(update, 1000 / 30);
+        canvas.addEventListener('mousemove', function (e) {
+            paddle1y = e.clientY - paddleHeight / 2;
+        });
+
+        canvas.addEventListener('mousemovex', function (e) {
+            paddle1x = e.clientX - paddleWidth / 2;
+        });
+    };
+
+    function memeSpawn() {
+        //Add point to opposer and reset ball
+        document.getElementById("video-div").innerHTML = getIframe();
+        document.getElementById("gif-div").innerHTML = getGif();
+        setTimeout(function () {
+            document.getElementById("gif-div").innerHTML = '';
+        }, 800);
+    }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function update() {
+        //Move the ball
+        ballx += xVelocity;
+        bally += yVelocity;
+
+        if (bally < 0 && yVelocity < 0) {
+            yVelocity = -yVelocity
+        }
+        if (bally > canvas.height && yVelocity > 0) {
+            yVelocity = -yVelocity
+        }
+
+        function reset() {
+            ballx = canvas.width / 2;
+            bally = canvas.width / 2;
+            yVelocity = 4;
+            xVelocity = -xVelocity;
+        }
+
+        if (ballx < 0) {
+            if (bally > paddle1y && bally < paddle1y + paddleHeight) {
+                xVelocity = -xVelocity;
+                deltay = bally - (paddle1y + paddleWidth / 2);
+                yVelocity = deltay * 0.5;
+            } else {
+                memeSpawn();
+                score2++;
+                reset();
+            }
+        }
+
+        if (ballx > canvas.width) {
+            if (bally > paddle2y && bally < paddle2y + paddleHeight) {
+                xVelocity = -xVelocity;
+                deltay = bally - (paddle2y + paddleWidth / 2);
+                yVelocity = deltay * 0.3;
+            } else {
+                memeSpawn();
+                score1++;
+                reset();
+            }
+        }
+
+        //Controls AI's Movement
+        if (paddle2y + paddleHeight / 2 < bally) {
+            paddle2y += aiSpeed;
+        } else {
+            paddle2y -= aiSpeed;
+        }
+
+        //Make canvas black at start of each frame
+        cc.fillStyle = 'black';
+        cc.fillRect(0, 0, canvas.width, canvas.height);
+
+        //Design the paddles
+        cc.fillStyle = 'white';
+        //Right Paddle
+        cc.fillRect(canvas.width - paddleWidth, paddle2y, paddleWidth, paddleHeight);
+        //Ball
+        cc.fillRect(ballx - ballDimension / 2, bally - ballDimension / 2, ballDimension, ballDimension);
+        cc.fillText(score2, canvas.width - 100, 100);
+        //Left Paddle
+        cc.fillStyle = getRandomColor();
+        cc.fillText(score1, 100, 100);
+        cc.fillRect(0, paddle1y, paddleWidth, paddleHeight);
+    }
+</script>
+
+</body>
+</html>
